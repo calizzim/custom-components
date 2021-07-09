@@ -9,6 +9,7 @@ import { Chart, Point } from "chart.js/dist/chart";
 })
 
 export class McalizziLinechartComponent implements AfterViewInit {
+  //required properties
   _data
   @Input('cr-data')
   set data(data) {
@@ -23,11 +24,39 @@ export class McalizziLinechartComponent implements AfterViewInit {
     return this._data
   }
 
+  //optional properties
+  @Input('co-yaxis-pipe') yaxisPipe
+  @Input('co-xaxis') xaxis
+  @Input('co-yaxis') yaxis
+  @Input('co-tooltip-prefix') tooltipPrefix
+
   @ViewChild('chart')
   private chartRef: ElementRef;
   private chart: Chart;
 
-  private colors = ["#0275d8","#5cb85c","#5bc0de","#f0ad4e","#d9534f","#292b2c","#f7f7f7"]
+  private colors = [
+    "rgb(2, 117, 216)", "rgb(92, 184, 92)","rgb(91, 192, 222)",
+    "rgb(240, 173, 78)", "rgb(217, 83, 79)", "rgb(41, 43, 44)",
+    "rgb(247, 247, 247)"]
+  private backgroundColors = [
+    "rgba(2, 117, 216, 0.2)", "rgba(92, 184, 92, 0.2)","rgba(91, 192, 222, 0.2)",
+    "rgba(240, 173, 78,0.2)", "rgba(217, 83, 79,0.2)", "rgba(41, 43, 44, 0.2)",
+    "rgba(247, 247, 247, 0.2)"]
+
+  private getTooltipTitle = (context) => {
+    let value = context[0].label
+    if(this.tooltipPrefix) return this.tooltipPrefix + ' ' + value
+    return value
+  }
+  private getTooltipLabel = (context) => {
+    let value = context.dataset.data[context.dataIndex]
+    if(this.yaxisPipe) return ' ' + this.yaxisPipe.transform(value)
+    return value
+  }
+  private formatTicks = (value, ...n) => {
+    if(this.yaxisPipe) return this.yaxisPipe.transform(value)
+    return value
+  }
 
   constructor() {
     console.log(this.data)
@@ -35,7 +64,6 @@ export class McalizziLinechartComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     this.chart = new Chart(this.chartRef.nativeElement, {
-      mainColor: this.colors[0],
       type: "line",
       data: {
         labels: this.data.xvalues,
@@ -43,6 +71,7 @@ export class McalizziLinechartComponent implements AfterViewInit {
           label: "money",
           data: this.data.yvalues,
           borderColor: this.colors[0],
+          backgroundColor: this.backgroundColors[0],
           fill: true,
           pointHoverRadius: 0,
           pointRadius: 0,
@@ -56,27 +85,25 @@ export class McalizziLinechartComponent implements AfterViewInit {
           },
           tooltip: {
             callbacks: {
-              title: context => '',
-              label: context => '$' + context.formattedValue,
+              title: this.getTooltipTitle,
+              label: this.getTooltipLabel,
             }
           }
         },
         scales: {
           x: {
             title: {
-              display: true,
-              text: 'your age (years)'
+              display: this.xaxis,
+              text: this.xaxis
             }
           },
           y: {
             title: {
-              display: true,
-              text: 'total wealth (dollars)'
+              display: this.yaxis,
+              text: this.yaxis
             },
             ticks: {
-              callback: function(value, index, values) {
-                return '$' + value
-              }
+              callback: this.formatTicks
             }
           }
         }

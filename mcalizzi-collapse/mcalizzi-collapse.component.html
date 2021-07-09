@@ -1,0 +1,14 @@
+<div class="accordion mt-5">
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button" [class.collapsed]="collapsed" (click)="collapsed = !collapsed">
+        {{ title || 'Advanced' }}
+      </button>
+    </h2>
+    <div class="accordion-collapse" [@collapse]="collapsed?'collapsed':'expanded'" style="overflow:'hidden'">
+      <div class="accordion-body">
+        <ng-content></ng-content>
+      </div>
+    </div>
+  </div>
+</div>

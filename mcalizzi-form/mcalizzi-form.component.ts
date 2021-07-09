@@ -33,6 +33,7 @@ export class McalizziFormComponent implements OnInit {
       this.formValues = await this.http.get('forms/formdata/'+this.templateName)
     }
     this.template = await this.template
+    console.log(this.template)
     for(let group of this.template.groups){
       let formGroup = new FormGroup({});
       for(let component of group.components){
