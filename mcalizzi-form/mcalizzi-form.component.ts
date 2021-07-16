@@ -17,10 +17,11 @@ export class McalizziFormComponent implements OnInit {
   @Input('alert') alert = { active: false, message: '' }
   
   //output properties
-  @Output('formSubmitted') data = new EventEmitter();
+  @Output('formSubmitted') formSubmitted = new EventEmitter();
   
   //class properties
   form = new FormGroup({});
+  loaded = false
   template
   formValues
   
@@ -33,11 +34,12 @@ export class McalizziFormComponent implements OnInit {
       this.formValues = await this.http.get('forms/formdata/'+this.templateName)
     }
     this.template = await this.template
-    console.log(this.template)
     for(let group of this.template.groups){
       let formGroup = new FormGroup({});
       for(let component of group.components){
-        let value = this.formValues ? this.formValues[component.name] || '' : ''
+        let value
+        if(component.defaultValue) value = component.defaultValue
+        if(this.formValues && this.formValues[component.name]) value = this.formValues[component.name]
         let formControl = new FormControl(
           value, 
           this.getValidators(component.validators),
@@ -47,6 +49,7 @@ export class McalizziFormComponent implements OnInit {
       }
       this.form.addControl(group.title,formGroup)
     }
+    this.loaded=true
   }
 
   isValid(group, field) {
@@ -60,6 +63,10 @@ export class McalizziFormComponent implements OnInit {
   isNeutral(group, field) {
     const obj = this.form.get([group.title, field.name])
     return !obj.touched && !this.failedToSubmit
+  }
+
+  containsAdvanced(group) {
+    return group.components.filter(e => e.advanced).length != 0
   }
   
   getMessage(group, field) {
@@ -84,7 +91,7 @@ export class McalizziFormComponent implements OnInit {
       }
     }
     if(this.submitAction == 'upload') data = await this.http.uploadForm(data,this.templateName)
-    this.data.emit(data)
+    this.formSubmitted.emit(data)
     if(this.template.resetOnSubmit) this.form.reset()
     this.failedToSubmit = false
   }

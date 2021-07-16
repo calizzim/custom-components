@@ -30,8 +30,7 @@ export class McalizziLinechartComponent implements AfterViewInit {
   @Input('co-yaxis') yaxis
   @Input('co-tooltip-prefix') tooltipPrefix
 
-  @ViewChild('chart')
-  private chartRef: ElementRef;
+  @ViewChild('chart') private chartRef: ElementRef;
   private chart: Chart;
 
   private colors = [
@@ -58,9 +57,7 @@ export class McalizziLinechartComponent implements AfterViewInit {
     return value
   }
 
-  constructor() {
-    console.log(this.data)
-  }
+  constructor() {}
 
   ngAfterViewInit() {
     this.chart = new Chart(this.chartRef.nativeElement, {

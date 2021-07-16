@@ -28,6 +28,7 @@ export class McalizziPiechartComponent implements AfterViewInit, OnInit {
   }
   //optional inputs
   @Input('co-yaxis-pipe') yaxisPipe
+  @Input('co-total-title') totalTitle = 'Total'
 
   @ViewChild('chart')
   private chartRef: ElementRef;
@@ -38,9 +39,7 @@ export class McalizziPiechartComponent implements AfterViewInit, OnInit {
     "rgb(240, 173, 78)", "rgb(217, 83, 79)", "rgb(41, 43, 44)",
     "rgb(247, 247, 247)"]
 
-  constructor() {
-    console.log(this.data)
-  }
+  constructor() {}
 
   ngOnInit() {
     this.dataTotal = this.data.yvalues.reduce((a,v) => a+v, 0)
@@ -54,7 +53,7 @@ export class McalizziPiechartComponent implements AfterViewInit, OnInit {
     let value = context.dataset.data[context.dataIndex]
     let percent = Math.round(value/this.dataTotal*100)
     if(this.yaxisPipe) value = this.yaxisPipe.transform(value)
-    return ' ' + value + '(' + percent + '%)'
+    return ' ' + value + ' (' + percent + '%)'
   }
 
   ngAfterViewInit() {
@@ -69,17 +68,20 @@ export class McalizziPiechartComponent implements AfterViewInit, OnInit {
         }]
       },
       options: {
-        maintainAspectRatio: false,
+        maintainAspectRatio: true,
+        aspectRatio: 2,
         plugins: {
           legend: {
-            position: 'right'
+            position: 'right',
+            align: 'center',
+            display: true
           },
           tooltip: {
             callbacks: {
               title: this.getTooltipTitle,
               label: this.getTooltipLabel
             }
-          }
+          },
         }
       }
     });
